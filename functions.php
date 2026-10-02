@@ -287,11 +287,27 @@ function eipro_master_scripts() {
 		}
 	}
 
+	if ( get_theme_mod( 'set_disable_immersive' ) != true ) {
+		wp_enqueue_style( 'eipro-immersive-style', get_template_directory_uri() . '/assets/css/immersive.css', array(), filemtime( get_template_directory() . '/assets/css/immersive.css' ) );
+		wp_enqueue_script( 'eipro-immersive-script', get_template_directory_uri() . '/assets/js/immersive.js', array(), filemtime( get_template_directory() . '/assets/js/immersive.js' ), true );
+	}
+
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );
 	}
 }
 add_action( 'wp_enqueue_scripts', 'eipro_master_scripts' );
+
+/**
+ * Pasang class ei-js sedini mungkin supaya animasi masuk halaman tidak berkedip.
+ */
+function eipro_immersive_head_flag() {
+	if ( get_theme_mod( 'set_disable_immersive' ) == true ) {
+		return;
+	}
+	echo "<script>document.documentElement.classList.add('ei-js');</script>\n";
+}
+add_action( 'wp_head', 'eipro_immersive_head_flag', 1 );
 
 /**
  * Remove sticky post from main query.

@@ -2242,6 +2242,17 @@ function customize_register_init( $wpc ){
         'type' => 'checkbox',
     ) );
 
+    // Disable Immersive Effects
+    $wpc->add_setting( 'set_disable_immersive', array(
+        'default' => false,
+    ) );
+    $wpc->add_control( 'con_disable_immersive', array(
+        'label' => __( 'Disable Immersive Effects (scroll animation, glass navbar, parallax)', 'eipro-master' ),
+        'section' => 'section_options',
+        'settings' => 'set_disable_immersive',
+        'type' => 'checkbox',
+    ) );
+
     // Hide Featured Image in single post
     $wpc->add_setting( 'set_hide_f_image_in_single_post', array(
         'default' => false,

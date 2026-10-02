@@ -1,0 +1,204 @@
+/*--------------------------------------------------------------
+# Immersive Layer
+# Efek tambahan untuk semua layout (personal, news, business).
+# Semua animasi hanya aktif jika JS jalan (html.ei-js) dan
+# pengguna tidak memilih "reduce motion".
+--------------------------------------------------------------*/
+
+:root {
+	--ei-ease: cubic-bezier(.22, 1, .36, 1);
+	--ei-reveal-distance: 28px;
+	--ei-reveal-duration: .9s;
+	--ei-glass-light: rgba(255, 255, 255, .72);
+	--ei-glass-dark: rgba(39, 41, 53, .72);
+	--ei-shadow: 0 10px 30px -12px rgba(16, 24, 40, .18);
+	--ei-shadow-strong: 0 22px 45px -18px rgba(16, 24, 40, .35);
+}
+
+/* Page enter
+--------------------------------------------- */
+html.ei-js body {
+	animation: ei-page-in .7s var(--ei-ease) both;
+}
+@keyframes ei-page-in {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+
+/* Scroll progress bar
+--------------------------------------------- */
+.ei-progress {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 3px;
+	z-index: 99999;
+	pointer-events: none;
+	transform-origin: 0 50%;
+	transform: scaleX(var(--ei-progress, 0));
+	background: linear-gradient(90deg, var(--color-primary), var(--color-secondary_bg));
+	box-shadow: 0 0 12px var(--color-primary);
+}
+body.admin-bar .ei-progress {
+	top: 32px;
+}
+@media screen and (max-width: 782px) {
+	body.admin-bar .ei-progress {
+		top: 46px;
+	}
+}
+
+/* Glass navbar (blur saat discroll, sembunyi saat scroll ke bawah)
+--------------------------------------------- */
+html.ei-js .main-navigation {
+	transition: transform .45s var(--ei-ease), box-shadow .35s ease, background-color .35s ease;
+	will-change: transform;
+}
+html.ei-js body.ei-scrolled .main-navigation {
+	background-color: var(--ei-glass-light) !important;
+	-webkit-backdrop-filter: saturate(180%) blur(14px);
+	backdrop-filter: saturate(180%) blur(14px);
+	box-shadow: var(--ei-shadow);
+}
+html[data-applied-mode=dark].ei-js body.ei-scrolled .main-navigation {
+	background-color: var(--ei-glass-dark) !important;
+}
+html.ei-js body.ei-scrolled .main-navigation .nav-left:after {
+	opacity: 0;
+}
+html.ei-js body.ei-nav-hidden .main-navigation {
+	transform: translateY(-110%);
+	box-shadow: none;
+}
+
+/* Scroll reveal
+--------------------------------------------- */
+html.ei-js .ei-reveal {
+	opacity: 0;
+	transform: translate3d(0, var(--ei-reveal-distance), 0);
+	transition:
+		opacity var(--ei-reveal-duration) var(--ei-ease),
+		transform var(--ei-reveal-duration) var(--ei-ease);
+	transition-delay: var(--ei-delay, 0s);
+}
+html.ei-js .ei-reveal.ei-visible {
+	opacity: 1;
+	transform: none;
+}
+
+/* Gambar post: zoom halus + sudut membulat
+--------------------------------------------- */
+.post-image,
+.c-also-read figure,
+.widget figure {
+	overflow: hidden;
+	border-radius: 12px;
+}
+.post-image img,
+.c-also-read figure img,
+.widget figure img {
+	transition: transform .8s var(--ei-ease), filter .6s ease;
+	will-change: transform;
+}
+article:hover .post-image img,
+.c-also-read:hover figure img,
+.widget li:hover figure img {
+	transform: scale(1.07);
+	filter: saturate(1.12);
+}
+
+/* Judul post: garis bawah animasi
+--------------------------------------------- */
+.post-title a {
+	background-image: linear-gradient(var(--color-primary), var(--color-primary));
+	background-size: 0% 2px;
+	background-position: 0 100%;
+	background-repeat: no-repeat;
+	transition: background-size .5s var(--ei-ease), color .3s ease;
+}
+article:hover .post-title a,
+.post-title a:hover,
+.post-title a:focus-visible {
+	background-size: 100% 2px;
+}
+
+/* Tombol: angkat + glow
+--------------------------------------------- */
+.c-btn,
+.elementor-button,
+button[type=submit],
+input[type=submit] {
+	transition: transform .35s var(--ei-ease), box-shadow .35s ease, filter .35s ease !important;
+}
+.c-btn:hover,
+.elementor-button:hover,
+button[type=submit]:hover,
+input[type=submit]:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 12px 24px -10px var(--color-primary);
+	filter: brightness(1.05);
+}
+.c-btn:active,
+.elementor-button:active {
+	transform: translateY(0);
+}
+
+/* Kartu Elementor (icon box, image box, testimonial, price) ikut terangkat
+--------------------------------------------- */
+.elementor-widget-icon-box .elementor-widget-container,
+.elementor-widget-image-box .elementor-widget-container,
+.elementor-widget-testimonial .elementor-widget-container,
+.elementor-widget-price-table .elementor-widget-container {
+	transition: transform .5s var(--ei-ease), box-shadow .5s ease;
+	border-radius: 12px;
+}
+.elementor-widget-icon-box:hover .elementor-widget-container,
+.elementor-widget-image-box:hover .elementor-widget-container,
+.elementor-widget-testimonial:hover .elementor-widget-container,
+.elementor-widget-price-table:hover .elementor-widget-container {
+	transform: translateY(-6px);
+	box-shadow: var(--ei-shadow-strong);
+}
+
+/* Parallax
+--------------------------------------------- */
+html.ei-js [data-ei-parallax] {
+	will-change: transform;
+	transform: translate3d(0, var(--ei-parallax, 0px), 0) scale(var(--ei-parallax-scale, 1));
+}
+
+/* Akses keyboard: fokus terlihat jelas
+--------------------------------------------- */
+a:focus-visible,
+button:focus-visible,
+.c-btn:focus-visible {
+	outline: 2px solid var(--color-primary);
+	outline-offset: 3px;
+	border-radius: 4px;
+}
+
+/* Reduce motion: matikan semua gerakan
+--------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+	html.ei-js body,
+	html.ei-js .ei-reveal,
+	html.ei-js .main-navigation,
+	.post-image img,
+	.post-title a,
+	.c-btn,
+	.elementor-button {
+		animation: none !important;
+		transition: none !important;
+	}
+	html.ei-js .ei-reveal {
+		opacity: 1;
+		transform: none;
+	}
+	html.ei-js [data-ei-parallax] {
+		transform: none;
+	}
+	html.ei-js body.ei-nav-hidden .main-navigation {
+		transform: none;
+	}
+}
