@@ -299,6 +299,44 @@ function eipro_master_scripts() {
 add_action( 'wp_enqueue_scripts', 'eipro_master_scripts' );
 
 /**
+ * Pulihkan pengaturan Customizer saat tema dipasang di folder baru (misalnya lewat deploy dari Git).
+ * WordPress menyimpan theme_mods per folder tema, jadi folder baru mulai dari pengaturan kosong.
+ * Jika tema aktif belum punya layout_set, salin theme_mods dari folder lama yang punya.
+ */
+function eipro_restore_theme_mods() {
+	$option_name = 'theme_mods_' . get_stylesheet();
+	$current     = get_option( $option_name );
+
+	if ( is_array( $current ) && ! empty( $current['layout_set'] ) ) {
+		return;
+	}
+	if ( get_option( 'eipro_theme_mods_restored_' . get_stylesheet() ) ) {
+		return;
+	}
+
+	global $wpdb;
+	$rows = $wpdb->get_results( $wpdb->prepare(
+		"SELECT option_name, option_value FROM {$wpdb->options} WHERE option_name LIKE %s AND option_name != %s",
+		$wpdb->esc_like( 'theme_mods_' ) . '%',
+		$option_name
+	) );
+
+	$best = null;
+	foreach ( $rows as $row ) {
+		$mods = maybe_unserialize( $row->option_value );
+		if ( is_array( $mods ) && ! empty( $mods['layout_set'] ) && ( $best === null || count( $mods ) > count( $best ) ) ) {
+			$best = $mods;
+		}
+	}
+
+	if ( $best !== null ) {
+		update_option( $option_name, array_merge( is_array( $current ) ? $current : array(), $best ) );
+	}
+	update_option( 'eipro_theme_mods_restored_' . get_stylesheet(), 1 );
+}
+add_action( 'after_setup_theme', 'eipro_restore_theme_mods', 0 );
+
+/**
  * Pasang class ei-js sedini mungkin supaya animasi masuk halaman tidak berkedip.
  */
 function eipro_immersive_head_flag() {
